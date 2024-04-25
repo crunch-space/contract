@@ -74,6 +74,13 @@ contract CrunchSpace is
     ) public override {
         // check tokenID exist
         require(TokenMap[tokenID].creator == address(0), "tokenID exist");
+        require(price > 0, "price must > 0");
+        require(creatorCommissionRate_ > 0, "creatorCommissionRate_ must > 0");
+        require(
+            creatorCommissionRate_ <= 100,
+            "creatorCommissionRate_ must <= 100"
+        );
+
         // deploy crunch app
         CrunchApp app = new CrunchApp(msg.sender, address(this), tokenID);
         TokenMap[tokenID] = TokenInfo(
