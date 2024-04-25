@@ -16,12 +16,12 @@ interface ICrunchApp {
 
     function creator() external view returns (address);
 
-    function sales() external view returns (uint256);
+    function totalSales() external view returns (uint256);
 
-    function userSales(address) external view returns (uint256);
+    function balance(address) external view returns (uint256);
 
     function invater(address) external view returns (address);
 
     // write function
-    function recharge(address invater, uint256 amount) external payable;
+    function recharge(address invater_, uint256 amount) external payable;
 }

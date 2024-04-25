@@ -20,12 +20,13 @@ interface ICrunchSpace {
     function mint(uint256 tokenID, uint256 amount) external payable;
 
     // claim && burn
-    function claim(uint256 tokenID, uint256 amount) external payable;
+    function burnToClaim(uint256 tokenID, uint256 amount) external payable;
 
     // deploy crunch app
     function deployCrunchApp(
         uint256 tokenID,
         uint256 price,
+        uint256 creatorCommissionRate_,
         uint256 amount
     ) external;
 

@@ -21,6 +21,7 @@ contract CrunchSpace is
         address initialOwner
     ) ERC1155("") Ownable(initialOwner) CrunchSigner(initialOwner) {}
 
+    //每个tokenID对应的总量
     mapping(uint256 => uint256) internal _totalSupply;
     uint256[] internal _layerCommissionRates; // app layer commission rates
 
@@ -30,6 +31,7 @@ contract CrunchSpace is
         uint256 totalSupply; // NFT total supply
         uint256 balance; // 设计师可提现金额
         uint256 rechargeBalance; // 充值金额
+        uint256 creatorCommissionRate; // 设计师分成比例
         address creator;
         address crunchApp;
     }
@@ -50,7 +52,10 @@ contract CrunchSpace is
         TokenMap[tokenID].balance += totalPrice;
     }
 
-    function claim(uint256 tokenID, uint256 amount) public payable override {
+    function burnToClaim(
+        uint256 tokenID,
+        uint256 amount
+    ) public payable override {
         require(balanceOf(msg.sender, tokenID) >= amount, "balance not enough");
         uint256 balance = (TokenMap[tokenID].rechargeBalance /
             totalSupplyOfTokenID(tokenID)) * amount;
@@ -64,6 +69,7 @@ contract CrunchSpace is
     function deployCrunchApp(
         uint256 tokenID,
         uint256 price,
+        uint256 creatorCommissionRate_,
         uint256 amount
     ) public override {
         // check tokenID exist
@@ -75,6 +81,7 @@ contract CrunchSpace is
             amount,
             0,
             0,
+            creatorCommissionRate_,
             msg.sender,
             address(app)
         );
@@ -111,13 +118,19 @@ contract CrunchSpace is
             totalSupplyOfTokenID(tokenID);
         uint256 rechargeBalance = TokenMap[tokenID].rechargeBalance;
         if (rechargeBalance >= totalPrice) {
-            // 分成
-            // payable(msg.sender).transfer(msg.value - totalPrice);
+            // creator 分成金额
+            uint256 creatorAmount = (msg.value *
+                TokenMap[tokenID].creatorCommissionRate) / 100;
+            payable(TokenMap[tokenID].creator).transfer(creatorAmount);
+            TokenMap[tokenID].rechargeBalance += msg.value - creatorAmount;
         } else if (rechargeBalance + msg.value > totalPrice) {
             // 分成金额
             uint256 balance = rechargeBalance + msg.value - totalPrice;
-            TokenMap[tokenID].rechargeBalance = totalPrice;
-            // payable(msg.sender).transfer(rechargeBalance + msg.value - totalPrice);
+            // creator 分成金额
+            uint256 creatorAmount = (balance *
+                TokenMap[tokenID].creatorCommissionRate) / 100;
+            payable(TokenMap[tokenID].creator).transfer(creatorAmount);
+            TokenMap[tokenID].rechargeBalance += msg.value - creatorAmount;
         } else {
             TokenMap[tokenID].rechargeBalance += msg.value;
         }
