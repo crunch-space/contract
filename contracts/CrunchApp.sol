@@ -9,7 +9,7 @@ contract CrunchApp is ICrunchApp, Ownable {
     address _spaceAddress;
     uint256 _tokenID;
     uint256 _price;
-    mapping(address => address) _invater;
+    mapping(address => address) _inviter;
     uint256 _totalSales;
     mapping(address => uint256) _userSales;
 
@@ -38,30 +38,35 @@ contract CrunchApp is ICrunchApp, Ownable {
         return _price;
     }
 
-    function invater(address user) public view returns (address) {
-        return _invater[user];
+    function inviter(address user) public view returns (address) {
+        return _inviter[user];
     }
 
-    function recharge(address invater_, uint256 amount) public payable {
+    function recharge(address inviter_, uint256 amount) public payable {
         require(msg.value == _price * amount, "price not match");
-        if (_invater[invater_] == address(0)) {
-            _invater[invater_] = msg.sender;
-            emit Invite(invater_, msg.sender);
+        if (
+            inviter_ != address(0) &&
+            inviter_ != msg.sender &&
+            _inviter[msg.sender] == address(0)
+        ) {
+            _inviter[msg.sender] = inviter_;
+            emit Invite(inviter_, msg.sender);
         }
         // 三层分润
         uint256[] memory rates = ICrunchSpace(_spaceAddress)
             .getCommissionRate();
         uint256 rechargeValue_ = msg.value;
         for (uint256 i = 0; i < rates.length; i++) {
-            address _invater_ = _invater[invater_];
-            if (_invater_ == address(0)) {
+            if (i > 0) {
+                inviter_ = _inviter[inviter_];
+            }
+            if (inviter_ == address(0)) {
                 break;
             }
             uint256 commission = (amount * rates[i]) / 100;
-            payable(_invater_).transfer(commission);
-            emit Commission(_invater_, msg.sender, commission, i + 1);
+            payable(inviter_).transfer(commission);
+            emit Commission(inviter_, msg.sender, commission, i + 1);
             rechargeValue_ -= commission;
-            invater_ = _invater_;
         }
         _userSales[msg.sender] += amount;
         _totalSales += amount;

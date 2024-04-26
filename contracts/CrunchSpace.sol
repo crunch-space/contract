@@ -7,8 +7,6 @@ import "./ICrunchSpace.sol";
 import "./CrunchApp.sol";
 import "./CrunchSigner.sol";
 
-// 问题1  投资人收益和设计师收益如何分配
-// 问题2  opensea 返回 还是实时返回
 // @creator yanghao@ohdat.io
 contract CrunchSpace is
     ERC1155,
@@ -26,6 +24,18 @@ contract CrunchSpace is
     uint256[] internal _layerCommissionRates; // app layer commission rates
 
     mapping(uint256 => TokenInfo) internal TokenMap;
+
+    modifier checkBeforeDeploy(uint256 tokenID, bytes memory signature_) {
+        //test network return
+        _;
+        return;
+        bytes memory h = abi.encodePacked(tokenID, msg.sender, address(this));
+        if (!checkSign(signature_, getHash(h))) {
+            revert InvalidSignature();
+        }
+        _;
+    }
+
     struct TokenInfo {
         uint256 price; // NFT 单价
         uint256 totalSupply; // NFT total supply
@@ -57,8 +67,7 @@ contract CrunchSpace is
         uint256 amount
     ) public payable override {
         require(balanceOf(msg.sender, tokenID) >= amount, "balance not enough");
-        uint256 balance = (TokenMap[tokenID].rechargeBalance /
-            totalSupplyOfTokenID(tokenID)) * amount;
+        uint256 balance = tokenPrice(tokenID) * amount;
         payable(msg.sender).transfer(balance);
         TokenMap[tokenID].rechargeBalance =
             TokenMap[tokenID].rechargeBalance -
@@ -70,8 +79,9 @@ contract CrunchSpace is
         uint256 tokenID,
         uint256 price,
         uint256 creatorCommissionRate_,
-        uint256 amount
-    ) public override {
+        uint256 amount,
+        bytes memory signature_
+    ) public override checkBeforeDeploy(tokenID, signature_) {
         // check tokenID exist
         require(TokenMap[tokenID].creator == address(0), "tokenID exist");
         require(price > 0, "price must > 0");
@@ -147,6 +157,13 @@ contract CrunchSpace is
         uint256 tokenID
     ) public view override returns (uint256) {
         return _totalSupply[tokenID];
+    }
+
+    function tokenPrice(
+        uint256 tokenID
+    ) public view override returns (uint256) {
+        return
+            TokenMap[tokenID].rechargeBalance / totalSupplyOfTokenID(tokenID);
     }
 
     function dappContract(
