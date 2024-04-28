@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-interface ICrunchSpace {
+interface ICrunchProtocol {
     //event
     //部署合约通知
-    event DeployCrunchApp(
+    event DeployCrunchVendor(
         address indexed creator,
         address indexed crunchApp,
         uint256 tokenID
@@ -16,8 +16,8 @@ interface ICrunchSpace {
     // claim && burn
     function burnToClaim(uint256 tokenID, uint256 amount) external payable;
 
-    // deploy crunch app
-    function deployCrunchApp(
+    // deploy crunch Vendor
+    function deployCrunchVendor(
         uint256 tokenID,
         uint256 price, //NFT 价格
         uint256 creatorCommissionRate_, // 创建者分润比例 1-100
@@ -35,22 +35,25 @@ interface ICrunchSpace {
     //充值
     // crunch app 合约利润打入到这个合约
     // 从其他的链的收益也打入到这个合约
-    function recharge(uint256 tokenID) external payable;
+    function revenuePool(uint256 tokenID) external payable;
 
     // withdraw
-    // 创作者 投资金额
-    function withdraw(uint256 tokenID, uint256 amount) external payable;
+    // 创作者 体现投资金额
+    function withdraw(
+        uint256 tokenID,
+        uint256 amount,
+        bytes memory signature,
+        string memory nonce
+    ) external payable;
 
     // read function
 
     //查询 tokenid 的 合约地址
-    function dappContract(uint256 tokenID) external view returns (address);
+    function contentContract(uint256 tokenID) external view returns (address);
 
     // tokenID 目前已经mint的数量
-    function totalSupplyOfTokenID(
-        uint256 tokenID
-    ) external view returns (uint256);
+    function tokenMinted(uint256 tokenID) external view returns (uint256);
 
     // 查询 token 可以兑换的价格
-    function tokenPrice(uint256 tokenID) external view returns (uint256);
+    function tokenValue(uint256 tokenID) external view returns (uint256);
 }

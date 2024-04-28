@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "./ICrunchApp.sol";
-import "./ICrunchSpace.sol";
+import "./ICrunchVendor.sol";
+import "./ICrunchProtocol.sol";
 
 // @creator yanghao@ohdat.io
-contract CrunchApp is ICrunchApp, Ownable {
+contract CrunchVendor is ICrunchVendor, Ownable {
     address _spaceAddress;
     uint256 _tokenID;
     uint256 _price;
@@ -22,7 +22,7 @@ contract CrunchApp is ICrunchApp, Ownable {
         _tokenID = tokenID;
     }
 
-    function dappID() public view returns (uint256) {
+    function contentID() public view returns (uint256) {
         return _tokenID;
     }
 
@@ -42,7 +42,7 @@ contract CrunchApp is ICrunchApp, Ownable {
         return _inviter[user];
     }
 
-    function recharge(address inviter_, uint256 amount) public payable {
+    function topUp(address inviter_, uint256 amount) public payable {
         require(msg.value == _price * amount, "price not match");
         if (
             inviter_ != address(0) &&
@@ -53,7 +53,7 @@ contract CrunchApp is ICrunchApp, Ownable {
             emit Invite(inviter_, msg.sender);
         }
         // 三层分润
-        uint256[] memory rates = ICrunchSpace(_spaceAddress)
+        uint256[] memory rates = ICrunchProtocol(_spaceAddress)
             .getCommissionRate();
         uint256 rechargeValue_ = msg.value;
         for (uint256 i = 0; i < rates.length; i++) {
@@ -70,14 +70,17 @@ contract CrunchApp is ICrunchApp, Ownable {
         }
         _userSales[msg.sender] += amount;
         _totalSales += amount;
-        ICrunchSpace(_spaceAddress).recharge{value: rechargeValue_}(_tokenID);
+        ICrunchProtocol(_spaceAddress).revenuePool{value: rechargeValue_}(
+            _tokenID
+        );
+        emit TopUpSuccess(msg.sender, amount);
     }
 
-    function balance(address add_) public view returns (uint256) {
-        return add_.balance;
+    function userBalance(address user_) public view returns (uint256) {
+        return _userSales[user_];
     }
 
-    function totalSales() public view returns (uint256) {
+    function boxOffice() public view returns (uint256) {
         return _totalSales;
     }
 }

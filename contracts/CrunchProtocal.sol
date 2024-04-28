@@ -3,25 +3,28 @@ pragma solidity ^0.8.20;
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Supply.sol";
-import "./ICrunchSpace.sol";
-import "./CrunchApp.sol";
+import "./ICrunchProtocol.sol";
+import "./CrunchVendor.sol";
 import "./CrunchSigner.sol";
 
 // @creator yanghao@ohdat.io
-contract CrunchSpace is
+contract CrunchProtocol is
     ERC1155,
     Ownable,
     ERC1155Supply,
-    ICrunchSpace,
+    ICrunchProtocol,
     CrunchSigner
 {
     constructor(
         address initialOwner
     ) ERC1155("") Ownable(initialOwner) CrunchSigner(initialOwner) {}
 
+    error NonceAlreadyExist();
+
     //每个tokenID对应的总量
     mapping(uint256 => uint256) internal _totalSupply;
     uint256[] internal _layerCommissionRates; // app layer commission rates
+    mapping(string => bool) private nonces;
 
     mapping(uint256 => TokenInfo) internal TokenMap;
 
@@ -31,6 +34,24 @@ contract CrunchSpace is
         return;
         bytes memory h = abi.encodePacked(tokenID, msg.sender, address(this));
         if (!checkSign(signature_, getHash(h))) {
+            revert InvalidSignature();
+        }
+        _;
+    }
+    modifier checkBeforeWithdraw(
+        uint256 tokenID,
+        uint256 amount,
+        bytes memory signatrue,
+        string memory nonce
+    ) {
+        //test network return
+        _;
+        return;
+        if (nonces[nonce]) {
+            revert NonceAlreadyExist();
+        }
+        bytes memory h = abi.encodePacked(tokenID, msg.sender, amount, nonce);
+        if (!checkSign(signatrue, getHash(h))) {
             revert InvalidSignature();
         }
         _;
@@ -67,7 +88,7 @@ contract CrunchSpace is
         uint256 amount
     ) public payable override {
         require(balanceOf(msg.sender, tokenID) >= amount, "balance not enough");
-        uint256 balance = tokenPrice(tokenID) * amount;
+        uint256 balance = tokenValue(tokenID) * amount;
         payable(msg.sender).transfer(balance);
         TokenMap[tokenID].rechargeBalance =
             TokenMap[tokenID].rechargeBalance -
@@ -75,7 +96,7 @@ contract CrunchSpace is
         _burn(msg.sender, tokenID, amount);
     }
 
-    function deployCrunchApp(
+    function deployCrunchVendor(
         uint256 tokenID,
         uint256 price,
         uint256 creatorCommissionRate_,
@@ -92,7 +113,7 @@ contract CrunchSpace is
         );
 
         // deploy crunch app
-        CrunchApp app = new CrunchApp(msg.sender, address(this), tokenID);
+        CrunchVendor app = new CrunchVendor(msg.sender, address(this), tokenID);
         TokenMap[tokenID] = TokenInfo(
             price,
             amount,
@@ -103,7 +124,7 @@ contract CrunchSpace is
             address(app)
         );
         // event
-        emit DeployCrunchApp(msg.sender, address(app), tokenID);
+        emit DeployCrunchVendor(msg.sender, address(app), tokenID);
     }
 
     function setCommissionRate(uint256[] memory rates) public override {
@@ -118,7 +139,13 @@ contract CrunchSpace is
         _setSigner(signer_);
     }
 
-    function withdraw(uint256 tokenID, uint256 amount) public payable override {
+    function withdraw(
+        uint256 tokenID,
+        uint256 amount,
+        bytes memory signatrue,
+        string memory nonce
+    ) public payable checkBeforeWithdraw(tokenID, amount, signatrue, nonce) {
+        //TODO
         //check token id
         require(TokenMap[tokenID].creator != address(0), "tokenID not exist");
         // check creator
@@ -129,10 +156,9 @@ contract CrunchSpace is
         payable(msg.sender).transfer(amount);
     }
 
-    function recharge(uint256 tokenID) public payable override {
+    function revenuePool(uint256 tokenID) public payable override {
         //
-        uint256 totalPrice = TokenMap[tokenID].price *
-            totalSupplyOfTokenID(tokenID);
+        uint256 totalPrice = TokenMap[tokenID].price * tokenMinted(tokenID);
         uint256 rechargeBalance = TokenMap[tokenID].rechargeBalance;
         if (rechargeBalance >= totalPrice) {
             // creator 分成金额
@@ -153,20 +179,19 @@ contract CrunchSpace is
         }
     }
 
-    function totalSupplyOfTokenID(
+    function tokenMinted(
         uint256 tokenID
     ) public view override returns (uint256) {
         return _totalSupply[tokenID];
     }
 
-    function tokenPrice(
+    function tokenValue(
         uint256 tokenID
     ) public view override returns (uint256) {
-        return
-            TokenMap[tokenID].rechargeBalance / totalSupplyOfTokenID(tokenID);
+        return TokenMap[tokenID].rechargeBalance / tokenMinted(tokenID);
     }
 
-    function dappContract(
+    function contentContract(
         uint256 tokenID
     ) public view override returns (address) {
         return TokenMap[tokenID].crunchApp;
