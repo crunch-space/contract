@@ -145,7 +145,6 @@ contract CrunchProtocol is
         bytes memory signatrue,
         string memory nonce
     ) public payable checkBeforeWithdraw(tokenID, amount, signatrue, nonce) {
-        //TODO
         //check token id
         require(TokenMap[tokenID].creator != address(0), "tokenID not exist");
         // check creator
