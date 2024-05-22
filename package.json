@@ -1,13 +1,22 @@
 {
-  "name": "crunch-contract",
-  "version": "1.0.0",
+  "name": "crunch",
+  "version": "0.0.0",
   "description": "",
-  "main": "index.js",
+  "types": "typechain-types/index.ts",
+  "main": "typechain-types/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ohdat/crunch-contract.git"
+  },
   "keywords": [],
   "author": "",
+  "bugs": {
+    "url": "https://github.com/ohdat/crunch-contract/issues"
+  },
+  "homepage": "https://github.com/ohdat/crunch-contract#readme",
   "license": "ISC",
   "devDependencies": {
     "@nomicfoundation/hardhat-chai-matchers": "^2.0.0",

@@ -1,0 +1,29 @@
+name: Node.js Package
+
+on:
+  workflow_dispatch:
+jobs:
+  publish-gpr:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 20
+          registry-url: https://npm.pkg.github.com/
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+      - name: Add version
+        run: sed -i '3s/\([0-9]\.[0-9]\)\.[0-9]\{1,10\}/\1.${{ github.run_number }}/g' package.json
+      - run: npm i
+      - run: cp .env.example .env
+      - run: npm run build
+      - run: npm publish
+      - name: GH Release
+        uses: softprops/action-gh-release@v0.1.15
+        with:
+          tag_name: npm.0.2.${{ github.run_number }}
+          target_commitish: ${{ github.sha }}
