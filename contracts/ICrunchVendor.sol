@@ -3,35 +3,35 @@ pragma solidity ^0.8.24;
 
 interface ICrunchVendor {
     //event
-    // 邀请成功通知
+    // Invitation success notification
     event Invite(address indexed inviter, address indexed invitee);
-    // 分润通知
+    // Distribution notice
     event Commission(
         address indexed inviter,
         address indexed invitee,
         uint256 amount,
         uint256 level
     );
-    // 用户充值成功通知
+    // User recharge success notification
     event TopUpSuccess(address indexed user, uint256 amount);
 
     // read function
-    // 获取 dapp 的 tokenID
+    // Get the tokenID of the dapp
     function contentID() external view returns (uint256);
 
-    // 获取创建者地址
+    // Get creator address
     function creator() external view returns (address);
 
-    // 总销售数量
+    // total sales quantity
     function boxOffice() external view returns (uint256);
 
-    //获取用户购买的数量
+    //Get the number of user purchases
     function userBalance(address) external view returns (uint256);
 
-    //查询邀请人
+    //Get inviter
     function inviter(address) external view returns (address);
 
     // write function
-    // 用户充值(购买)
+    // User recharge (purchase)
     function topUp(address invater_, uint256 amount) external payable;
 }

@@ -3,14 +3,14 @@ pragma solidity ^0.8.24;
 
 interface ICrunchProtocol {
     //event
-    //部署合约通知
+    //Deployment contract notice
     event DeployCrunchVendor(
         address indexed creator,
         address indexed crunchApp,
         uint256 tokenID
     );
 
-    //mint (众筹)
+    //mint
     function mint(uint256 tokenID, uint256 amount) external payable;
 
     // claim && burn
@@ -19,26 +19,26 @@ interface ICrunchProtocol {
     // deploy crunch Vendor
     function deployCrunchVendor(
         uint256 tokenID,
-        uint256 price, //NFT 价格
-        uint256 creatorCommissionRate_, // 创建者分润比例 1-100
-        uint256 amount, // NFT 总量
+        uint256 price, //NFT price
+        uint256 creatorCommissionRate_, // Creator share ratio 1-100
+        uint256 amount, // NFT quantity
         bytes memory signature_
     ) external;
 
-    // 设置每层分润比例
-    // example: [10, 5, 3] //三层分润 10%, 5%, 3%
+    // Set the moisture ratio for each layer
+    // example: [10, 5, 3] 10%, 5%, 3%
     function setCommissionRate(uint256[] memory rates) external;
 
-    // 获取分润比例
+    // Get the proportion of share
     function getCommissionRate() external view returns (uint256[] memory);
 
-    //充值
-    // crunch app 合约利润打入到这个合约
-    // 从其他的链的收益也打入到这个合约
+    //recharge
+    // crunch app Contract profits are channeled into this contract
+    // Proceeds from other chains also feed into this contract
     function revenuePool(uint256 tokenID) external payable;
 
     // withdraw
-    // 创作者 体现投资金额
+    // The creator reflects the investment amount
     function withdraw(
         uint256 tokenID,
         uint256 amount,
@@ -48,12 +48,13 @@ interface ICrunchProtocol {
 
     // read function
 
-    //查询 tokenid 的 合约地址
+    //Get the contract address of tokenid
     function contentContract(uint256 tokenID) external view returns (address);
 
-    // tokenID 目前已经mint的数量
+    // tokenID
+    // The current number of mint
     function tokenMinted(uint256 tokenID) external view returns (uint256);
 
-    // 查询 token 可以兑换的价格
+    // Get the price at which the token can be exchanged
     function tokenValue(uint256 tokenID) external view returns (uint256);
 }

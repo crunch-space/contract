@@ -7,7 +7,6 @@ import "./ICrunchProtocol.sol";
 import "./CrunchVendor.sol";
 import "./CrunchSigner.sol";
 
-// @creator yanghao@ohdat.io
 contract CrunchProtocol is
     ERC1155,
     Ownable,
@@ -21,7 +20,7 @@ contract CrunchProtocol is
 
     error NonceAlreadyExist();
 
-    //每个tokenID对应的总量
+    //The total amount of each token ID
     mapping(uint256 => uint256) internal _totalSupply;
     uint256[] internal _layerCommissionRates; // app layer commission rates
     mapping(string => bool) private nonces;
@@ -160,15 +159,15 @@ contract CrunchProtocol is
         uint256 totalPrice = TokenMap[tokenID].price * tokenMinted(tokenID);
         uint256 rechargeBalance = TokenMap[tokenID].rechargeBalance;
         if (rechargeBalance >= totalPrice) {
-            // creator 分成金额
+            // creator Share amount
             uint256 creatorAmount = (msg.value *
                 TokenMap[tokenID].creatorCommissionRate) / 100;
             payable(TokenMap[tokenID].creator).transfer(creatorAmount);
             TokenMap[tokenID].rechargeBalance += msg.value - creatorAmount;
         } else if (rechargeBalance + msg.value > totalPrice) {
-            // 分成金额
+            // Share amount
             uint256 balance = rechargeBalance + msg.value - totalPrice;
-            // creator 分成金额
+            // creator Share amount
             uint256 creatorAmount = (balance *
                 TokenMap[tokenID].creatorCommissionRate) / 100;
             payable(TokenMap[tokenID].creator).transfer(creatorAmount);

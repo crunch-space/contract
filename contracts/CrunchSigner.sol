@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-// @creator yanghao@ohdat.io
 contract CrunchSigner {
     error SignatureLengthNotEnough65();
     error InvalidSignature();
