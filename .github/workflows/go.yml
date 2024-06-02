@@ -25,7 +25,7 @@ jobs:
 
       - name: Download @openzeppelin Libraries
         run: |
-          git clone <https://github.com/OpenZeppelin/openzeppelin-contracts.git>
+          git clone https://github.com/OpenZeppelin/openzeppelin-contracts.git
           mv openzeppelin-contracts @openzeppelin
 
       - name: Generate Binary and Abi Files Using .sol File
