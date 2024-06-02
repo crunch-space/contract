@@ -22,6 +22,22 @@ jobs:
       - name: get solce
         uses: pontem-network/get-solc@master
       - uses: gacts/install-geth-tools@v1
+
+      - name: Download @openzeppelin Libraries
+        run: |
+          git clone <https://github.com/OpenZeppelin/openzeppelin-contracts.git>
+          mv openzeppelin-contracts @openzeppelin
+
+      - name: Generate Binary and Abi Files Using .sol File
+        run: |
+          solc --abi --bin contracts/CrunchProtocal.sol -o build
+          solc --abi --bin contracts/CrunchVendor.sol -o build
+
+      - name: Generate .go File Using Binary and Abi files
+        run: |
+          abigen --bin=./build/CrunchProtocal.bin --abi=./build/CrunchProtocal.abi --pkg=contract --out=CrunchProtocal.go
+          abigen --bin=./build/CrunchVendor.bin --abi=./build/CrunchVendor.abi --pkg=contract --out=CrunchVendor.go
+
       - name: ls
         run: ls
       - uses: stefanzweifel/git-auto-commit-action@v5
