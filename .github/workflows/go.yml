@@ -42,7 +42,7 @@ jobs:
       - uses: stefanzweifel/git-auto-commit-action@v5
         id: commit
         with:
-          # branch: golang/${{ env.APPVERSION }}
+          branch: golang
           tagging_message: ${{ env.APPVERSION  }}
           create_branch: true
           commit_message: "Update generated golang code"
