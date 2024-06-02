@@ -42,7 +42,7 @@ jobs:
       - uses: stefanzweifel/git-auto-commit-action@v5
         id: commit
         with:
-          branch: golang/${{ env.APPVERSION }}
+          # branch: golang/${{ env.APPVERSION }}
           tagging_message: ${{ env.APPVERSION  }}
           create_branch: true
           commit_message: "Update generated golang code"
@@ -53,8 +53,8 @@ jobs:
       #   with:
       #     tag_name: ${{ env.APPVERSION  }}
       #     target_commitish: ${{ steps.commit.outputs.commit_hash }}
-      - name: Delete branch
-        uses: dawidd6/action-delete-branch@v3.1.0
-        with:
-          github_token: ${{github.token}}
-          branches: golang/${{ env.APPVERSION }}
+      # - name: Delete branch
+      #   uses: dawidd6/action-delete-branch@v3.1.0
+      #   with:
+      #     github_token: ${{github.token}}
+      #     branches: golang/${{ env.APPVERSION }}
