@@ -1,6 +1,6 @@
 # This is a basic workflow that is manually triggered
 
-name: generate golang code v0.1.x
+name: Golang Package
 env:
   APPVERSION: v0.1.${{ github.run_number }}
 # Controls when the action will run. Workflow runs when manually triggered using the UI
