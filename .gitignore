@@ -19,4 +19,3 @@ node_modules
 #golang generated files
 /build
 @openzeppelin
-*.go
