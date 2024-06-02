@@ -1,6 +1,6 @@
 {
   "name": "crunch-contract",
-  "version": "0.0.1",
+  "version": "0.1.1",
   "description": "",
   "types": "typechain-types/index.ts",
   "main": "typechain-types/index.js",
