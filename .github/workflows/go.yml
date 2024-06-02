@@ -30,12 +30,11 @@ jobs:
 
       - name: Generate Binary and Abi Files Using .sol File
         run: |
-          solc --abi --bin contracts/CrunchProtocal.sol -o build
-          solc --abi --bin contracts/CrunchVendor.sol -o build
+          solc --abi --bin contracts/CrunchProtocol.sol -o build
 
       - name: Generate .go File Using Binary and Abi files
         run: |
-          abigen --bin=./build/CrunchProtocal.bin --abi=./build/CrunchProtocal.abi --pkg=contract --out=CrunchProtocal.go
+          abigen --bin=./build/CrunchProtocol.bin --abi=./build/CrunchProtocol.abi --pkg=contract --out=CrunchProtocol.go
           abigen --bin=./build/CrunchVendor.bin --abi=./build/CrunchVendor.abi --pkg=contract --out=CrunchVendor.go
 
       - name: ls

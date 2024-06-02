@@ -13,6 +13,10 @@ node_modules
 /coverage
 /coverage.json
 
-
 # env
 .env
+
+#golang generated files
+/build
+@openzeppelin
+*.go
