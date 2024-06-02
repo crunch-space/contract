@@ -45,12 +45,14 @@ jobs:
           branch: golang/${{ env.APPVERSION }}
           tagging_message: ${{ env.APPVERSION  }}
           create_branch: true
-          commit_message: "Update generated code"
-      - name: GH Release
-        uses: softprops/action-gh-release@v0.1.14
-        with:
-          tag_name: ${{ env.APPVERSION  }}
-          target_commitish: ${{ steps.commit.outputs.commit_hash }}
+          commit_message: "Update generated golang code"
+          file_pattern: "*.go"
+
+      # - name: GH Release
+      #   uses: softprops/action-gh-release@v0.1.14
+      #   with:
+      #     tag_name: ${{ env.APPVERSION  }}
+      #     target_commitish: ${{ steps.commit.outputs.commit_hash }}
       - name: Delete branch
         uses: dawidd6/action-delete-branch@v3.1.0
         with:
