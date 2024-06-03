@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/crunchorg/contract.git"
+    "url": "git+https://github.com/crunch-space/contract.git"
   },
   "keywords": [],
   "author": "eric",
@@ -19,9 +19,9 @@
     "wagmi/*"
   ],
   "bugs": {
-    "url": "https://github.com/crunchorg/contract/issues"
+    "url": "https://github.com/crunch-space/contract/issues"
   },
-  "homepage": "https://github.com/crunchorg/contract#readme",
+  "homepage": "https://github.com/crunch-space/contract#readme",
   "license": "ISC",
   "devDependencies": {
     "@nomicfoundation/hardhat-chai-matchers": "^2.0.0",

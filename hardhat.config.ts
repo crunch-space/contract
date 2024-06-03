@@ -1,7 +1,18 @@
-import { HardhatUserConfig } from "hardhat/config";
+import { HardhatUserConfig, task } from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox";
 import * as dotenv from "dotenv";
 dotenv.config();
+task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
+  const accounts = await hre.ethers.getSigners();
+  console.log("network:", hre.network.name);
+  // const accounts = await (await hre.ethers.getAddress()).getSigners();
+  for (const account of accounts) {
+    console.log(
+      account.address,
+      await hre.ethers.provider.getBalance(account.address)
+    );
+  }
+});
 
 const config: HardhatUserConfig = {
   solidity: "0.8.24",
