@@ -28,9 +28,9 @@ contract CrunchProtocol is
     mapping(uint256 => TokenInfo) internal TokenMap;
 
     modifier checkBeforeDeploy(uint256 tokenID, bytes memory signature_) {
-        //test network return
         _;
-        return;
+        //test network return
+        // return;
         bytes memory h = abi.encodePacked(tokenID, msg.sender, address(this));
         if (!checkSign(signature_, getHash(h))) {
             revert InvalidSignature();
@@ -43,9 +43,9 @@ contract CrunchProtocol is
         bytes memory signatrue,
         string memory nonce
     ) {
-        //test network return
         _;
-        return;
+        //test network return
+        // return;
         if (nonces[nonce]) {
             revert NonceAlreadyExist();
         }
